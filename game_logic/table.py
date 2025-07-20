@@ -1,7 +1,11 @@
 # Table class handles the deck, players' hands, player and dealer turns and determine the outcomes 
 # of a game round.
 
-from config import Decision, BLACKJACK_VALUE, PAYOUT_RATIO_BLACKJACK_TO_PLAYER, NUM_CARDS_PER_DECK, NUM_DECKS
+import random
+from config import (
+    Decision, 
+    BLACKJACK_VALUE, PAYOUT_RATIO_BLACKJACK_TO_PLAYER, NUM_CARDS_PER_DECK, NUM_DECKS, POSSIBLE_BETS
+)
 from .deck import Deck
 from players.base_player import Player
 from players.dealer import Dealer
@@ -22,6 +26,7 @@ class Table:
         # dictionary to track the outcome for each player
         self.outcomes = {}
         self.visualizer = CardVisualizer()
+        # self.player_initial_bets = {player.name: 0 for player in self.players}
 
     def play_round(self):
         """Manages the logic for a single round of Blackjack."""
@@ -83,9 +88,12 @@ class Table:
         # --- Game flow ---
         # players place their bets
         for player in self.players:
-            player.place_bet(20)   # example bet
-            
+            player_bet = player.choose_bets()
+            if player_bet is None:
+                player_bet = 20
+            player.place_bet(player_bet)
             print(f"{player.name} placed a bet of {player.bets[0]} chips")
+            # self.player_initial_bets[player.name] = player_bet
 
     def _deal_initial_cards(self):
         """Deals two cards to each player and the dealer."""
@@ -259,7 +267,7 @@ class Table:
                 if action == Decision.HIT:
                     player.add_card_to_hand(self.deck.deal_card(), hand_index)
                     print(f"{player.name} hits on hand {hand_index + 1}. Hand: {hand}, Value: {hand.calculate_total_value()}")
-                    # TODO: visualize
+                    # visualize
                     self.visualizer.display_cards(player.hand[0].cards, title=f"{player.name} hand")
                     # update context
                     context["cards_in_play"].append(hand.cards[-1])

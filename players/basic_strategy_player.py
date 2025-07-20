@@ -8,14 +8,18 @@ from .base_player import Player
 from game_logic.card import Card
 from game_logic.hand import Hand
 from game_logic.deck import Deck
-from config import Decision, NUM_DECKS, NUM_CARDS_PER_DECK
+from config import Decision, NUM_DECKS, NUM_CARDS_PER_DECK, POSSIBLE_BETS
 
 class BasicStrategyPlayer(Player):
     """
     Player class that acts rationally based on some well-known "good" strategy.
     """
-    def __init__(self, name, chips = 1000):
+    def __init__(self, name, chips):
         super().__init__(name, chips)
+        # self.type = PlayerTypes.BASIC
+    
+    def choose_bets(self):
+        return random.choices(POSSIBLE_BETS, weights=(0.2, 0.5, 0.2, 0.1), k=1)[0]
 
     def get_possible_decisions(self, hand_index = 0):
         return super().get_possible_decisions(hand_index)

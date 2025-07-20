@@ -14,7 +14,7 @@ from players.human_player import HumanPlayer
 from players.naive_strategy_player import NaiveStrategyPlayer
 from players.ai_player import LLMPlayer
 from .results_analyzer import ResultsAnalyzer
-from config import BLACKJACK_VALUE, PAYOUT_RATIO_BLACKJACK_TO_PLAYER
+from config import PlayerTypes, DEFAULT_OLLAMA_MODEL, BLACKJACK_VALUE, PAYOUT_RATIO_BLACKJACK_TO_PLAYER
 
 class GameRunner:
     """
@@ -48,14 +48,14 @@ class GameRunner:
 
             # add seat position to the player object for easy reference 
             player_instance = None
-            if player_type == 'human':
+            if player_type == PlayerTypes.HUMAN.value:
                 player_instance = HumanPlayer(name, chips)
-            elif player_type == 'llm':
-                model = config.get('model', 'deepseek-r1:8b')
+            elif player_type == PlayerTypes.LLM.value:
+                model = config.get('model', DEFAULT_OLLAMA_MODEL)
                 player_instance = LLMPlayer(name, chips, model)
-            elif player_type == 'basic':
+            elif player_type == PlayerTypes.BASIC.value:
                 player_instance = BasicStrategyPlayer(name, chips)
-            elif player_type == 'naive':
+            elif player_type == PlayerTypes.NAIVE.value:
                 player_instance = NaiveStrategyPlayer(name, chips)
             else:
                 raise ValueError(f"Unknown player type: {player_type}")

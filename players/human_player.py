@@ -2,15 +2,34 @@ from typing import Optional
 from .base_player import Player
 from game_logic.hand import Hand
 from game_logic.card import Card
-from config import Decision, BLACKJACK_VALUE
+from config import Decision, BLACKJACK_VALUE, POSSIBLE_BETS
 
 class HumanPlayer(Player):
     """
     Represents a human player in the Blackjack game.
     This player type will prompt the user for decisions.
     """
-    def __init__(self, name, chips = 1000):
+    def __init__(self, name, chips):
         super().__init__(name, chips)
+        # self.type = PlayerTypes.HUMAN
+
+    def choose_bets(self):
+        """Prompts human player to choose bet amounts"""
+        print(f"\n{'=' * 50}")
+        print(f"CHOOSE YOUR BETS: {POSSIBLE_BETS}")
+        print(f"\n{'=' * 50}")
+
+        while True:
+            user_input = input("What bet amount would you take? ")
+
+            try:
+                number_input = int(user_input)
+                if number_input in POSSIBLE_BETS:
+                    return number_input
+                print("Please just enter the valid bets: ", POSSIBLE_BETS)
+            except ValueError:
+                print("Please enter valid bet amounts: ", POSSIBLE_BETS)
+
 
     def make_decision_insurance(self, context = None):
         """

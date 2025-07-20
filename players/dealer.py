@@ -12,11 +12,14 @@ class Dealer(Player):
     Inherits from the Player class and implements the dealer's fixed playing rules
     """
     def __init__(self):
-        super().__init__(name="Dealer", chips=1_000)
+        super().__init__(name="Dealer", chips=1_000_000)
 
     def get_upcard(self):
         """Returns the upcard of the dealer's hand."""
         return self.hand[0].cards[0]
+    
+    def choose_bets(self):
+        pass
 
     def get_possible_decisions(self):
         pass

@@ -13,8 +13,9 @@ PAYOUT_RATIO_BLACKJACK_TO_PLAYER = 1.5
 PAYOUT_RATIO_BLACKJACK_SPLIT_PAIRS = 1.0
 PAYOUT_RATIO_BLACKJACK_TO_DEALER = 1.0
 # RATIO_SIDE_BET_TO_MAIN_BET = 0.5
-INITIAL_BET = 10_000
+INITIAL_PLAYERS_CHIPS = 10_000
 POSSIBLE_BETS = (10, 20, 50, 100)
+DEFAULT_OLLAMA_MODEL = "deepseek-r1:8b"
 
 # card rank value dict
 cards_rank_value_dict = {
@@ -42,3 +43,10 @@ class Decision(Enum):
     DOUBLE_DOWN = 'double-down'
     SPLIT = 'split'
     SURRENDER = 'surrender'
+
+# PLAYER_TYPES
+class PlayerTypes(Enum):
+    BASIC = 'basic'
+    HUMAN = 'human'
+    LLM = 'llm'
+    NAIVE = 'naive'

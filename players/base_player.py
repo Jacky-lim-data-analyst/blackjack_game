@@ -4,7 +4,7 @@
 from abc import ABC, abstractmethod
 from game_logic.card import Card
 from game_logic.hand import Hand
-from config import Decision, BLACKJACK_VALUE
+from config import Decision, BLACKJACK_VALUE, INITIAL_PLAYERS_CHIPS
 from typing import Optional
 
 class Player(ABC):
@@ -12,7 +12,7 @@ class Player(ABC):
     An abstract base class for a player in a Blackjack game.
     It defines the common interface for all player types.
     """
-    def __init__(self, name: str, chips: int = 1000):
+    def __init__(self, name: str, chips: int = INITIAL_PLAYERS_CHIPS):
         """
         Initializes a Player object.
 
@@ -27,6 +27,14 @@ class Player(ABC):
         self.bets = []
         # Insurance bet
         self.insurance_bet = 0
+        self.type = None
+
+    @abstractmethod
+    def choose_bets(self):
+        """
+        Choose the bet amount for each hand
+        """
+        pass
     
     # other players' cards are also visible
     @abstractmethod

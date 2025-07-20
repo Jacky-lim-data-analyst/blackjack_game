@@ -12,7 +12,7 @@ from ollama import AsyncClient
 from .base_player import Player
 from game_logic.hand import Hand
 from game_logic.card import Card
-from config import Decision
+from config import Decision, DEFAULT_OLLAMA_MODEL, POSSIBLE_BETS
 
 class LLMDecision(BaseModel):
     """
@@ -33,7 +33,7 @@ class LLMPlayer(Player):
     """
     An AI player that uses LLM to make decisions.
     """
-    def __init__(self, name, chips = 1000, model: str = "deepseek-r1"):
+    def __init__(self, name, chips, model: str = DEFAULT_OLLAMA_MODEL):
         """
         Initializes the LLMPlayer.
 
@@ -43,11 +43,16 @@ class LLMPlayer(Player):
             model (str): The Ollama LLM model to use.
         """
         super().__init__(name, chips)
+        # self.type = PlayerTypes.LLM
         self.local_llm = AsyncClient()
         self.model = model
 
     def get_possible_decisions(self, hand_index = 0):
         return super().get_possible_decisions(hand_index)
+    
+    def choose_bets(self):
+        # TODO
+        return super().choose_bets()
 
     def make_decision(self, hand: Hand, dealer_upcard: Card, context: Optional[dict] = None) -> Decision:
         """
@@ -63,6 +68,52 @@ class LLMPlayer(Player):
         """
         # The game loop is asynchronous, so we run the async method and wait for its result
         return asyncio.run(self._async_make_decision(hand, dealer_upcard, context))
+    
+    async def _async_choose_bets(self, available_bets: list[int]) -> int:
+        """Async method to get structured bet decision from LLM"""
+        class LLMBetDecision(BaseModel):
+            """
+            A Pydantic model to structure the decision output from the LLM.
+            """
+            bet_amount: int = Field(..., description=f"Bet amounts chosen from available options: {available_bets}")
+            reasoning: str = Field(..., description="Brief rationale for bet choice")
+
+        system_prompt = f"""
+        You're an expert Blackjack player. Choose a bet amount considering:
+        - Available chips: {self.chips}
+        - Table limits: {POSSIBLE_BETS}
+        - Valid options: {available_bets}
+        Use smart bankroll management.
+        Respond ONLY in JSON format matching the schema.
+        """
+
+        user_prompt = f"Select your bet amount from {available_bets}:"
+        try:
+            response = await self.local_llm.chat(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
+                format=LLMBetDecision.model_json_schema(),
+                options={'temperature': 0.1}
+            )
+
+            # parse and validate response
+            decision = LLMBetDecision.model_validate_json(response.message.content)
+            print(f"{self.name} bets ${decision.bet_amount}.\nReasoning: {decision.reasoning}")
+
+            # Ensure LLM chose valid bet
+            if decision.bet_amount in available_bets:
+                return decision.bet_amount
+            else:
+                print(f"Invalid bet ${decision.bet_amount}. Defaulting to min bet")
+                return min(available_bets)
+
+        except Exception as e:
+            print(f"LLM bet error: {e}. Use min bet ${min(available_bets)}")
+            return min(available_bets)
+
 
     async def _async_make_decision(self, hand: Hand, dealer_upcard: Card, context: Optional[dict] = None) -> Decision:
         """
