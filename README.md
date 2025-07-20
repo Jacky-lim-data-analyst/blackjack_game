@@ -1,4 +1,4 @@
-# Black Simulator
+# Blackjack Simulator
 
 A modular Python Blackjack simulator for running AI, human, and strategy-based players against a dealer. Supports simulation, interactive play, and statistical analysis.
 
@@ -70,7 +70,7 @@ After simulation or interactive play, the game generates a detailed report inclu
 - Payout variance
 - Dealer statistics
 
-Results are saved to game_history.json for further analysis.
+Results are saved to `game_history.json` for further analysis.
 
 ## Customization
 1. Modify game rules in `config.py`.
