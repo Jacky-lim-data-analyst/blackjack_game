@@ -51,23 +51,29 @@ class LLMPlayer(Player):
         return super().get_possible_decisions(hand_index)
     
     def choose_bets(self):
-        # TODO
-        return super().choose_bets()
+        """Synchronous wrapper for async choose bet method
+        Uses LLM to choose a valid bet amount from POSSIBLE_BETS within chip limits
+        Places the bet using place_bet if valid, otherwise defaults to minimum bet"""
 
-    def make_decision(self, hand: Hand, dealer_upcard: Card, context: Optional[dict] = None) -> Decision:
-        """
-        Synchronous wrapper for the async decision-making process.
+        # get available bets within chip limits
+        available_bets = [bet for bet in POSSIBLE_BETS if 0 < bet <= self.chips]
+
+        if not available_bets:
+            # handle cases where no valid bets possible
+            print(f"{self.name}: Insufficient chips for any bet. Sitting out")
+            self.bets = [0]
+            return
         
-        Args:
-            hand (Hand): The player's hand.
-            dealer_upcard (Card): The upcard of the dealer's hand.
-            context (dict, optional): Additional context for decision-making. Defaults to None.
+        # get bet decision from LLM
+        bet_amount = asyncio.run(self._async_choose_bets(available_bets))
 
-        Returns:
-            Decision: The decision made by the llm.
-        """
-        # The game loop is asynchronous, so we run the async method and wait for its result
-        return asyncio.run(self._async_make_decision(hand, dealer_upcard, context))
+        try:
+            # place validated bet
+            if bet_amount > 0:
+                self.place_bet(bet_amount)
+        except ValueError as e:
+            print(f"Bet placement error: {e}. Sitting out")
+            self.bets = [0]
     
     async def _async_choose_bets(self, available_bets: list[int]) -> int:
         """Async method to get structured bet decision from LLM"""
@@ -113,6 +119,23 @@ class LLMPlayer(Player):
         except Exception as e:
             print(f"LLM bet error: {e}. Use min bet ${min(available_bets)}")
             return min(available_bets)
+
+    def make_decision(self, hand: Hand, dealer_upcard: Card, context: Optional[dict] = None) -> Decision:
+        """
+        Synchronous wrapper for the async decision-making process.
+        
+        Args:
+            hand (Hand): The player's hand.
+            dealer_upcard (Card): The upcard of the dealer's hand.
+            context (dict, optional): Additional context for decision-making. Defaults to None.
+
+        Returns:
+            Decision: The decision made by the llm.
+        """
+        # The game loop is asynchronous, so we run the async method and wait for its result
+        return asyncio.run(self._async_make_decision(hand, dealer_upcard, context))
+    
+    
 
 
     async def _async_make_decision(self, hand: Hand, dealer_upcard: Card, context: Optional[dict] = None) -> Decision:
