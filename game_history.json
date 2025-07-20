@@ -2,41 +2,59 @@
     {
         "round": 1,
         "dealer_hand": {
-            "initial_hand": "[2 of Spades, A of Hearts]",
-            "final_hand": "[2 of Spades, A of Hearts, 10 of Clubs, 10 of Diamonds]",
-            "final_value": 23,
+            "initial_hand": "[Q of Spades, 10 of Clubs]",
+            "final_hand": "[Q of Spades, 10 of Clubs]",
+            "final_value": 20,
             "is_blackjack": false,
-            "is_busted": true
+            "is_busted": false
         },
         "players": [
             {
-                "name": "basic",
+                "name": "BasicBot",
                 "seat": 1,
                 "chips_before": 1000,
-                "chips_after": 1020,
+                "chips_after": 990.0,
                 "hands": [
                     {
-                        "initial_hand": "K of Spades, 5 of Hearts",
-                        "final_hand": "K of Spades, 5 of Hearts",
+                        "initial_hand": "5 of Spades, Q of Hearts",
+                        "final_hand": "5 of Spades, Q of Hearts",
                         "final_value": 15,
                         "bet": 20,
-                        "outcome": "Win",
-                        "payout": 20,
+                        "outcome": "Surrender",
+                        "payout": -10.0,
                         "is_blackjack": false,
                         "is_busted": false
                     }
                 ]
             },
             {
-                "name": "naive",
+                "name": "NaiveBot",
                 "seat": 2,
+                "chips_before": 1000,
+                "chips_after": 960,
+                "hands": [
+                    {
+                        "initial_hand": "Q of Clubs, 9 of Clubs, 5 of Diamonds",
+                        "final_hand": "Q of Clubs, 9 of Clubs, 5 of Diamonds",
+                        "final_value": 24,
+                        "bet": 40,
+                        "outcome": "Bust",
+                        "payout": -40,
+                        "is_blackjack": false,
+                        "is_busted": true
+                    }
+                ]
+            },
+            {
+                "name": "Noob",
+                "seat": 3,
                 "chips_before": 1000,
                 "chips_after": 1020,
                 "hands": [
                     {
-                        "initial_hand": "Q of Diamonds, 5 of Hearts",
-                        "final_hand": "Q of Diamonds, 5 of Hearts",
-                        "final_value": 15,
+                        "initial_hand": "7 of Hearts, 3 of Diamonds, A of Clubs",
+                        "final_hand": "7 of Hearts, 3 of Diamonds, A of Clubs",
+                        "final_value": 21,
                         "bet": 20,
                         "outcome": "Win",
                         "payout": 20,
@@ -50,41 +68,23 @@
     {
         "round": 2,
         "dealer_hand": {
-            "initial_hand": "[6 of Clubs, 4 of Clubs]",
-            "final_hand": "[6 of Clubs, 4 of Clubs, 7 of Spades]",
-            "final_value": 17,
+            "initial_hand": "[5 of Spades, 8 of Hearts]",
+            "final_hand": "[5 of Spades, 8 of Hearts, A of Clubs, J of Spades]",
+            "final_value": 24,
             "is_blackjack": false,
-            "is_busted": false
+            "is_busted": true
         },
         "players": [
             {
-                "name": "basic",
+                "name": "BasicBot",
                 "seat": 1,
-                "chips_before": 1020,
-                "chips_after": 1000,
+                "chips_before": 990.0,
+                "chips_after": 1010.0,
                 "hands": [
                     {
-                        "initial_hand": "8 of Diamonds, 4 of Hearts",
-                        "final_hand": "8 of Diamonds, 4 of Hearts",
+                        "initial_hand": "5 of Clubs, 3 of Spades, 3 of Diamonds, A of Hearts",
+                        "final_hand": "5 of Clubs, 3 of Spades, 3 of Diamonds, A of Hearts",
                         "final_value": 12,
-                        "bet": 20,
-                        "outcome": "Loss",
-                        "payout": -20,
-                        "is_blackjack": false,
-                        "is_busted": false
-                    }
-                ]
-            },
-            {
-                "name": "naive",
-                "seat": 2,
-                "chips_before": 1020,
-                "chips_after": 1040,
-                "hands": [
-                    {
-                        "initial_hand": "3 of Spades, 8 of Diamonds",
-                        "final_hand": "3 of Spades, 8 of Diamonds, K of Clubs",
-                        "final_value": 21,
                         "bet": 20,
                         "outcome": "Win",
                         "payout": 20,
@@ -92,47 +92,35 @@
                         "is_busted": false
                     }
                 ]
-            }
-        ]
-    },
-    {
-        "round": 3,
-        "dealer_hand": {
-            "initial_hand": "[4 of Clubs, 5 of Hearts]",
-            "final_hand": "[4 of Clubs, 5 of Hearts, A of Diamonds]",
-            "final_value": 20,
-            "is_blackjack": false,
-            "is_busted": false
-        },
-        "players": [
+            },
             {
-                "name": "basic",
-                "seat": 1,
-                "chips_before": 1000,
-                "chips_after": 1000,
+                "name": "NaiveBot",
+                "seat": 2,
+                "chips_before": 960,
+                "chips_after": 940,
                 "hands": [
                     {
-                        "initial_hand": "2 of Clubs, 6 of Diamonds",
-                        "final_hand": "2 of Clubs, 6 of Diamonds, 2 of Hearts, J of Spades",
-                        "final_value": 20,
+                        "initial_hand": "5 of Diamonds, 7 of Spades, Q of Spades",
+                        "final_hand": "5 of Diamonds, 7 of Spades, Q of Spades",
+                        "final_value": 22,
                         "bet": 20,
-                        "outcome": "Push",
-                        "payout": 0,
+                        "outcome": "Bust",
+                        "payout": -20,
                         "is_blackjack": false,
-                        "is_busted": false
+                        "is_busted": true
                     }
                 ]
             },
             {
-                "name": "naive",
-                "seat": 2,
-                "chips_before": 1040,
-                "chips_after": 1030.0,
+                "name": "Noob",
+                "seat": 3,
+                "chips_before": 1020,
+                "chips_after": 1010.0,
                 "hands": [
                     {
-                        "initial_hand": "A of Clubs, 8 of Clubs",
-                        "final_hand": "A of Clubs, 8 of Clubs",
-                        "final_value": 19,
+                        "initial_hand": "2 of Hearts, K of Clubs",
+                        "final_hand": "2 of Hearts, K of Clubs",
+                        "final_value": 12,
                         "bet": 20,
                         "outcome": "Surrender",
                         "payout": -10.0,
@@ -144,94 +132,64 @@
         ]
     },
     {
-        "round": 4,
+        "round": 3,
         "dealer_hand": {
-            "initial_hand": "[9 of Diamonds, 10 of Diamonds]",
-            "final_hand": "[9 of Diamonds, 10 of Diamonds]",
-            "final_value": 19,
+            "initial_hand": "[5 of Spades, Q of Clubs]",
+            "final_hand": "[5 of Spades, Q of Clubs, K of Spades]",
+            "final_value": 25,
             "is_blackjack": false,
-            "is_busted": false
+            "is_busted": true
         },
         "players": [
             {
-                "name": "basic",
+                "name": "BasicBot",
                 "seat": 1,
-                "chips_before": 1000,
+                "chips_before": 1010.0,
+                "chips_after": 1030.0,
+                "hands": [
+                    {
+                        "initial_hand": "6 of Diamonds, J of Diamonds",
+                        "final_hand": "6 of Diamonds, J of Diamonds",
+                        "final_value": 16,
+                        "bet": 20,
+                        "outcome": "Win",
+                        "payout": 20,
+                        "is_blackjack": false,
+                        "is_busted": false
+                    }
+                ]
+            },
+            {
+                "name": "NaiveBot",
+                "seat": 2,
+                "chips_before": 940,
                 "chips_after": 960,
                 "hands": [
                     {
-                        "initial_hand": "Q of Diamonds, J of Spades",
-                        "final_hand": "Q of Diamonds, J of Spades, 9 of Hearts",
-                        "final_value": 29,
-                        "bet": 40,
-                        "outcome": "Bust",
-                        "payout": -40,
+                        "initial_hand": "3 of Spades, 9 of Hearts",
+                        "final_hand": "3 of Spades, 9 of Hearts",
+                        "final_value": 12,
+                        "bet": 20,
+                        "outcome": "Win",
+                        "payout": 20,
                         "is_blackjack": false,
-                        "is_busted": true
+                        "is_busted": false
                     }
                 ]
             },
             {
-                "name": "naive",
-                "seat": 2,
-                "chips_before": 1030.0,
-                "chips_after": 1010.0,
-                "hands": [
-                    {
-                        "initial_hand": "9 of Hearts, 10 of Clubs",
-                        "final_hand": "9 of Hearts, 10 of Clubs, Q of Hearts",
-                        "final_value": 29,
-                        "bet": 20,
-                        "outcome": "Bust",
-                        "payout": -20,
-                        "is_blackjack": false,
-                        "is_busted": true
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "round": 5,
-        "dealer_hand": {
-            "initial_hand": "[9 of Clubs, 3 of Spades]",
-            "final_hand": "[9 of Clubs, 3 of Spades, 6 of Diamonds]",
-            "final_value": 18,
-            "is_blackjack": false,
-            "is_busted": false
-        },
-        "players": [
-            {
-                "name": "basic",
-                "seat": 1,
-                "chips_before": 960,
-                "chips_after": 940,
-                "hands": [
-                    {
-                        "initial_hand": "5 of Clubs, 8 of Diamonds",
-                        "final_hand": "5 of Clubs, 8 of Diamonds, 10 of Clubs",
-                        "final_value": 23,
-                        "bet": 20,
-                        "outcome": "Bust",
-                        "payout": -20,
-                        "is_blackjack": false,
-                        "is_busted": true
-                    }
-                ]
-            },
-            {
-                "name": "naive",
-                "seat": 2,
+                "name": "Noob",
+                "seat": 3,
                 "chips_before": 1010.0,
-                "chips_after": 990.0,
+                "chips_after": 1050.0,
                 "hands": [
                     {
-                        "initial_hand": "2 of Spades, 2 of Diamonds",
-                        "final_hand": "2 of Spades, 2 of Diamonds, J of Diamonds",
-                        "final_value": 14,
-                        "bet": 20,
-                        "outcome": "Loss",
-                        "payout": -20,
+                        "initial_hand": "7 of Spades, 4 of Diamonds, 10 of Spades",
+                        "final_hand": "7 of Spades, 4 of Diamonds, 10 of Spades",
+                        "final_value": 21,
+                        "bet": 40,
+                        "outcome": "Win",
+                        "payout": 40,
                         "is_blackjack": false,
                         "is_busted": false
                     }

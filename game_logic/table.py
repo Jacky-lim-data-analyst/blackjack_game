@@ -364,10 +364,10 @@ class Table:
                 result_str = ""
                 if outcome == "Blackjack":
                     payout = bet * PAYOUT_RATIO_BLACKJACK_TO_PLAYER + bet
-                    result_str = f"Hand {i+1}: Wins {payout} with Blackjack"
+                    result_str = f"Hand {i+1}: Wins {payout - bet} with Blackjack"
                 elif outcome == "Win":
                     payout = bet * 2
-                    result_str = f"Hand {i+1}: Wins {payout}"
+                    result_str = f"Hand {i+1}: Wins {payout - bet}"
                 elif outcome == "Loss" or outcome == "Bust":
                     payout = 0
                     result_str = f"Hand {i+1}: Loses {bet}"

@@ -109,8 +109,16 @@ class GameRunner:
                     payout = -bet / 2
                 # push results in a payout of 0
 
+                # figure out which initial hand to show, if player split
+                initial_snapshot = initial_hands.get(player.name, [])
+                if i < len(initial_snapshot):
+                    initial_hand_str = str(initial_snapshot[i])
+                else:
+                    # created by split, show only 1 card
+                    initial_hand_str = str([hand.cards[0]])
+
                 hand_data = {
-                    'initial_hand': str(initial_hands[player.name][i]),
+                    'initial_hand': initial_hand_str,
                     'final_hand': str(hand),
                     'final_value': hand.calculate_total_value(),
                     'bet': bet,
@@ -154,7 +162,7 @@ class GameRunner:
         # capture initial hands for results analysis: make sure to not overwrite the "initial" hand data
         initial_hands = {
             'dealer': str(self.table.dealer.hand),
-            **{p.name: [str(h) for h in p.hand] for p in self.players}
+            **{p.name: [h for h in p.hand] for p in self.players}
         }
         
         # 4. checks for and handle blackjacks. End the round if dealer or all players have blackjack
