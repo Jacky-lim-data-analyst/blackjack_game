@@ -10,9 +10,6 @@ A modular Python Blackjack simulator for running AI, human, and strategy-based p
 - Detailed round history and statistical analysis (win rates, bust rates, RTP, variance)
 - Extensible architecture for new strategies and player types
 
-## Project Structure
-
-
 ## Getting Started
 
 ### Requirements
@@ -79,6 +76,7 @@ Results are saved to game_history.json for further analysis.
 1. Modify game rules in `config.py`.
 2. Add new player strategies by subclassing Player.
 3. Extend analysis/reporting in analysis/results_analyzer.py.
+4. Extend the AI player capabilities by using state-of-the-art AI models with your API tokens by subclassing from the `Player` parent class.
 
 ## License
 MIT License. See [LICENSE](./LICENSE) for details.
