@@ -29,7 +29,7 @@ class LLMInsuranceDecision(BaseModel):
     side_bet_or_not: bool = Field(..., description="True to take the insurance bet, False otherwise")
     reasoning: str = Field(..., description="Brief explanation of the reasoning behind the decision.")
 
-class LLMPlayer(Player):
+class LLMPlayerAsync(Player):
     """
     An AI player that uses LLM to make decisions.
     """

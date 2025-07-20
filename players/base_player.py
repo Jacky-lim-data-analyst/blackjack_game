@@ -28,6 +28,7 @@ class Player(ABC):
         # Insurance bet
         self.insurance_bet = 0
         self.type = None
+        self.is_sitting_out = False
 
     @abstractmethod
     def choose_bets(self):
@@ -177,6 +178,7 @@ class Player(ABC):
         """Resets the player hand and status for a new round"""
         self.hand = [Hand()]
         self.bets = []
+        self.is_sitting_out = False    # reset status to active
     
     def has_blackjack(self) -> bool:
         """

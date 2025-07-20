@@ -12,9 +12,9 @@ from players.basic_strategy_player import BasicStrategyPlayer
 from players.dealer import Dealer
 from players.human_player import HumanPlayer
 from players.naive_strategy_player import NaiveStrategyPlayer
-from players.ai_player import LLMPlayer
+from players.llm_player import LocalLLMPlayer
 from .results_analyzer import ResultsAnalyzer
-from config import PlayerTypes, DEFAULT_OLLAMA_MODEL, BLACKJACK_VALUE, PAYOUT_RATIO_BLACKJACK_TO_PLAYER
+from config import PlayerTypes, DEFAULT_OLLAMA_MODEL, BLACKJACK_VALUE, PAYOUT_RATIO_BLACKJACK_TO_PLAYER, MIN_CHIPS_TO_PLAY
 
 class GameRunner:
     """
@@ -52,7 +52,7 @@ class GameRunner:
                 player_instance = HumanPlayer(name, chips)
             elif player_type == PlayerTypes.LLM.value:
                 model = config.get('model', DEFAULT_OLLAMA_MODEL)
-                player_instance = LLMPlayer(name, chips, model)
+                player_instance = LocalLLMPlayer(name, chips, model)
             elif player_type == PlayerTypes.BASIC.value:
                 player_instance = BasicStrategyPlayer(name, chips)
             elif player_type == PlayerTypes.NAIVE.value:
@@ -92,43 +92,55 @@ class GameRunner:
                 'hands': []
             }
 
-            outcomes = self.table.outcomes.get(player, [])
-            for i, hand in enumerate(player.hand):
-                bet = player.bets[i]
-                outcome = outcomes[i] if i < len(outcomes) else 'Unknown'
+            if player.is_sitting_out:
+                player_data['hands'].append({
+                    'initial_hand': 'N/A',
+                    'final_hand': 'N/A',
+                    'final_value': 0,
+                    'bet': 0,
+                    'outcome': 'Sat Out',
+                    'payout': 0,
+                    'is_blackjack': False,
+                    'is_busted': False
+                })
+            else:
+                outcomes = self.table.outcomes.get(player, [])
+                for i, hand in enumerate(player.hand):
+                    bet = player.bets[i]
+                    outcome = outcomes[i] if i < len(outcomes) else 'Unknown'
 
-                # calculate payout based on outcome 
-                payout = 0
-                if outcome == 'Blackjack':
-                    payout = bet * PAYOUT_RATIO_BLACKJACK_TO_PLAYER
-                elif outcome == 'Win':
-                    payout = bet
-                elif outcome == 'Loss' or outcome == 'Bust':
-                    payout = -bet
-                elif outcome == 'Surrender':
-                    payout = -bet / 2
-                # push results in a payout of 0
+                    # calculate payout based on outcome 
+                    payout = 0
+                    if outcome == 'Blackjack':
+                        payout = bet * PAYOUT_RATIO_BLACKJACK_TO_PLAYER
+                    elif outcome == 'Win':
+                        payout = bet
+                    elif outcome == 'Loss' or outcome == 'Bust':
+                        payout = -bet
+                    elif outcome == 'Surrender':
+                        payout = -bet / 2
+                    # push results in a payout of 0
 
-                # figure out which initial hand to show, if player split
-                initial_snapshot = initial_hands.get(player.name, [])
-                if i < len(initial_snapshot):
-                    initial_hand_str = str(initial_snapshot[i])
-                else:
-                    # created by split, show only 1 card
-                    initial_hand_str = str([hand.cards[0]])
+                    # figure out which initial hand to show, if player split
+                    initial_snapshot = initial_hands.get(player.name, [])
+                    if i < len(initial_snapshot):
+                        initial_hand_str = str(initial_snapshot[i])
+                    else:
+                        # created by split, show only 1 card
+                        initial_hand_str = str([hand.cards[0]])
 
-                hand_data = {
-                    'initial_hand': initial_hand_str,
-                    'final_hand': str(hand),
-                    'final_value': hand.calculate_total_value(),
-                    'bet': bet,
-                    'outcome': outcome,
-                    'payout': payout,
-                    'is_blackjack': hand.get_num_cards() == 2 and hand.calculate_total_value() == BLACKJACK_VALUE,
-                    'is_busted': hand.calculate_total_value() > BLACKJACK_VALUE
-                }
+                    hand_data = {
+                        'initial_hand': initial_hand_str,
+                        'final_hand': str(hand),
+                        'final_value': hand.calculate_total_value(),
+                        'bet': bet,
+                        'outcome': outcome,
+                        'payout': payout,
+                        'is_blackjack': hand.get_num_cards() == 2 and hand.calculate_total_value() == BLACKJACK_VALUE,
+                        'is_busted': hand.calculate_total_value() > BLACKJACK_VALUE
+                    }
 
-                player_data['hands'].append(hand_data)
+                    player_data['hands'].append(hand_data)
 
             round_data['players'].append(player_data)
 
@@ -142,6 +154,22 @@ class GameRunner:
         self.round_number += 1
         print(f"\n--- Round {self.round_number} ---")
 
+        # identify active players for this round
+        active_players = []
+        for player in self.players:
+            # reset player's state for new round
+            player.reset_for_new_round()
+
+            if player.chips >= MIN_CHIPS_TO_PLAY:
+                active_players.append(player)
+            else:
+                # mark player as sitting out
+                player.is_sitting_out = True
+                print(f"{player.name} has insufficient chips ({player.chips}) and is sitting out")
+
+        if not active_players:
+            print("No player has enough chips left")
+            return
         # store chip counts before the round starts
         initial_chip_counts = {player.name: player.chips for player in self.players}
 
@@ -152,11 +180,13 @@ class GameRunner:
         self.table._deal_initial_cards()
         self.table._show_initial_cards()
 
+        cards_in_play = [card for player in self.table.players for card in player.hand[0].cards] + \
+                [self.table.dealer.get_upcard()]
+
         # context for decision making 
         initial_game_context = {
             "num_players": len(self.players),
-            "cards_in_play": [card for player in self.table.players for card in player.hand[0].cards] + \
-                [self.table.dealer.get_upcard()]
+            "cards_in_play": cards_in_play
         }
 
         # capture initial hands for results analysis: make sure to not overwrite the "initial" hand data
@@ -165,20 +195,23 @@ class GameRunner:
             **{p.name: [h for h in p.hand] for p in self.players}
         }
 
-        # TODO: possibility of side-bet insurance
+        # possibility of side-bet insurance
+        if self.dealer.get_upcard().rank == 'A':
+            initial_game_context["prob_10_as_dealer_hc"] = self.table._calculate_prob_hc(cards_in_play)
+            self.table._offer_insurance(initial_game_context)
         
         # 4. checks for and handle blackjacks. End the round if dealer or all players have blackjack
         round_over = self.table._handle_blackjacks()
 
         if not round_over:
             # player turns
-            for player in self.players:
+            for player in self.table.players:
                 # a player who has a blackjack or lost to a dealer blackjack already has an outcome and does not play
                 if not self.table.outcomes.get(player, []):
                     self.table._player_turn(player, initial_context=initial_game_context)
 
             # dealer's turn, if any players are still in the game
-            if any(i >= len(self.table.outcomes.get(player, [])) for player in self.players for i, h in enumerate(player.hand)):
+            if any(i >= len(self.table.outcomes.get(player, [])) for player in self.table.players for i, h in enumerate(player.hand)):
                 self.table._dealer_turn()
 
         # determine the final outcomes and conclude the round
@@ -197,7 +230,7 @@ class GameRunner:
         current_round = 0
 
         while current_round < rounds_to_play:
-            if all(p.chips <= 0 for p in self.players):
+            if all(p.chips < MIN_CHIPS_TO_PLAY for p in self.players):
                 print("All players are out of chips. Ending game")
                 break
 
