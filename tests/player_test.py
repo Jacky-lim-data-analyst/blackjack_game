@@ -77,7 +77,7 @@ print(f"The dealer upcard: {dealer.get_upcard()}")
 #     print("The decision is None")
 
 # --- checks for human player ---
-human_player = HumanPlayer(name="YoloPlayer")
+human_player = HumanPlayer(name="YoloPlayer", chips=1000)
 human_player.place_bet(20)
 
 human_player.hand[0].add_card(my_deck.deal_card())
