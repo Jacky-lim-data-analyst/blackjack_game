@@ -37,9 +37,7 @@ A modular Python Blackjack simulator for running AI, human, and strategy-based p
 
 3. Install dependencies:
     ```sh
-    pip install numpy
-    # For LLMPlayer (optional):
-    # ollama must be installed and running locally
+    pip install -r requirements.txt
     ```
 
 ## Usage
