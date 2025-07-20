@@ -164,6 +164,8 @@ class GameRunner:
             'dealer': str(self.table.dealer.hand),
             **{p.name: [h for h in p.hand] for p in self.players}
         }
+
+        # TODO: possibility of side-bet insurance
         
         # 4. checks for and handle blackjacks. End the round if dealer or all players have blackjack
         round_over = self.table._handle_blackjacks()

@@ -9,6 +9,7 @@ if __name__ == '__main__':
         {'type': 'basic', 'name': 'BasicBot'},
         {'type': 'naive', 'name': 'NaiveBot'},
         {'type': 'human', 'name': 'Noob'},
+        {'type': 'llm', 'name': 'LLMBJMaster', 'model': 'deepseek-r1:1.5b'}
     ]
 
     # --- run the game ---
