@@ -173,5 +173,10 @@ class BasicStrategyPlayer(Player):
                 return Decision.HIT
             else:
                 return Decision.STAND
+            
+        # never surrender when hand is 19 and above
+        if player_value >= 19:
+            if Decision.SURRENDER in possible_decisions:
+                possible_decisions.remove(Decision.SURRENDER)
         
         return random.choice(possible_decisions)

@@ -36,7 +36,7 @@ class GameRunner:
         self.table = Table(self.players, self.dealer)
         self.round_history = []
         self.round_number = 0
-        self.start_time = None
+        self.start_time = 0
 
     def _create_players(self, configs: List[dict]) -> List[Player]:
         """Creates player instances based on configuration"""
@@ -93,11 +93,11 @@ class GameRunner:
             }
 
             outcomes = self.table.outcomes.get(player, [])
-            for i, hand in enumerate(player.hands):
+            for i, hand in enumerate(player.hand):
                 bet = player.bets[i]
                 outcome = outcomes[i] if i < len(outcomes) else 'Unknown'
 
-                # calculate payout based on outcome
+                # calculate payout based on outcome 
                 payout = 0
                 if outcome == 'Blackjack':
                     payout = bet * PAYOUT_RATIO_BLACKJACK_TO_PLAYER
@@ -144,9 +144,18 @@ class GameRunner:
         self.table._deal_initial_cards()
         self.table._show_initial_cards()
 
-        # 3. capture initial hands right after dealing for data analysis
-        initial_dealer_hand = self.table.dealer.hand.cards[0] if self.table.dealer.hand.cards else "N/A"
-        initial_player_hand = {p.name: p.hand[:] for p in self.players}
+        # context for decision making 
+        initial_game_context = {
+            "num_players": len(self.players),
+            "cards_in_play": [card for player in self.table.players for card in player.hand[0].cards] + \
+                [self.table.dealer.get_upcard()]
+        }
+
+        # capture initial hands for results analysis: make sure to not overwrite the "initial" hand data
+        initial_hands = {
+            'dealer': str(self.table.dealer.hand),
+            **{p.name: [str(h) for h in p.hand] for p in self.players}
+        }
         
         # 4. checks for and handle blackjacks. End the round if dealer or all players have blackjack
         round_over = self.table._handle_blackjacks()
@@ -156,18 +165,19 @@ class GameRunner:
             for player in self.players:
                 # a player who has a blackjack or lost to a dealer blackjack already has an outcome and does not play
                 if not self.table.outcomes.get(player, []):
-                    self.table._player_turn(player)
+                    self.table._player_turn(player, initial_context=initial_game_context)
 
             # dealer's turn, if any players are still in the game
-            if any(i >= len(self.table.outcomes.get(player, [])) for player in self.players for i, h in enumerate(player.hands)):
+            if any(i >= len(self.table.outcomes.get(player, [])) for player in self.players for i, h in enumerate(player.hand)):
                 self.table._dealer_turn()
 
         # determine the final outcomes and conclude the round
         self.table._determine_outcomes()
+        self.table._show_final_hands()
         self.table._conclude_round()
 
         # Collect data after the round is fully concluded
-        self._collect_round_data(initial_chip_counts, {'dealer': initial_dealer_hand, **initial_player_hand})
+        self._collect_round_data(initial_chip_counts, initial_hands=initial_hands)
 
     def _run_game_loop(self, num_rounds: int = -1):
         """Internal game loop for both simulation and interactive game"""

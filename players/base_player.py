@@ -22,6 +22,7 @@ class Player(ABC):
         """
         self.name = name
         self.chips = chips
+        self.seat = 0    # seat number
         self.hand = [Hand()]
         self.bets = []
         # Insurance bet
@@ -102,14 +103,14 @@ class Player(ABC):
         """Split a hand into two hands"""
         try:
             original_hand = self.hand[hand_index]
+            if not self.can_split(original_hand):
+                return False
+            
             original_bet = self.bets[hand_index]
             split_card = original_hand.split()
 
             if split_card is None:
                 print("Split card not available")
-                return False
-
-            if not self.can_split(original_hand):
                 return False
 
             # create a new hand with one of the cards

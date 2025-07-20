@@ -56,7 +56,7 @@ class CardVisualizer:
     def create_card_art(self, card):
         """Create ASCII art for a single card"""
         suit_symbol = self.suit_symbols[card.suit]
-        color = self.suit_colors[card.suit]
+        # color = self.suit_colors[card.suit]
         rank = self.rank_display[card.rank]
 
         # adjust spacing for 10
@@ -67,13 +67,13 @@ class CardVisualizer:
             rank_top = rank + ' '
             rank_bottom = ' ' + rank
 
-        card_art = f"""{color}┌───────┐
-        |{rank_top}        |
+        card_art = f"""        ┌─────────┐
+        |{rank_top}       |
         |         |
         |    {suit_symbol}    |
         |         |
-        |        {rank_bottom}|
-        └───────┘{self.reset_color}
+        |       {rank_bottom}|
+        └─────────┘
         """
 
         return card_art
@@ -132,8 +132,10 @@ class CardVisualizer:
         else:
             print(self.create_card_art(card))
 
-    def display_cards(self, cards, fancy=False):
+    def display_cards(self, cards, title=None, fancy=False):
         """Display a list of cards"""
+        print(f"{title}:")
+        print("=" * 5)
         if not cards:
             print("No cards to display")
             return
@@ -154,6 +156,7 @@ class CardVisualizer:
                 if j < len(card_arts) - 1:
                     line += " "   # spaces between cards
             print(line)
+        print()
 
     def display_hand(self, cards, title="Hand", fancy=False):
         """Display a hand of cards"""
