@@ -170,6 +170,9 @@ class GameRunner:
         if not active_players:
             print("No player has enough chips left")
             return
+        
+        # update the players
+        self.players = active_players
         # store chip counts before the round starts
         initial_chip_counts = {player.name: player.chips for player in self.players}
 
