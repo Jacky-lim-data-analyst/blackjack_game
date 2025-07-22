@@ -5,10 +5,11 @@ from .card import Card
 from config import BLACKJACK_VALUE
 
 class Hand:
-    def __init__(self):
+    def __init__(self, split_hand=False):
         """"""
         # starts with empty hand
         self.cards: list[Card] = []
+        self.split_hand = split_hand
     
     def add_card(self, card: Card):
         self.cards.append(card)

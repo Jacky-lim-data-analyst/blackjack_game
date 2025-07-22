@@ -226,6 +226,8 @@ class Table:
                         print(f"New hand 2: {player.hand[hand_index + 1]}")
                         assert len(player.hand[hand_index].cards) == 2
                         assert len(player.hand[hand_index + 1].cards) == 2
+                        player.hand[hand_index].split_hand = True
+                        player.hand[hand_index + 1].split_hand = True
                         # visualize
                         self.visualizer.display_cards(player.hand[hand_index].cards, title=f"{player.name} hand {hand_index + 1}")
                         self.visualizer.display_cards(player.hand[hand_index + 1].cards, title=f"{player.name} hand {hand_index + 2}")
@@ -371,7 +373,10 @@ class Table:
                 payout = 0   # payout here refers to the gross amount: win amount + bet amount
                 result_str = ""
                 if outcome == "Blackjack":
-                    payout = bet * PAYOUT_RATIO_BLACKJACK_TO_PLAYER + bet
+                    if player.hand[0].split_hand:
+                        payout = bet * 2
+                    else:
+                        payout = bet * PAYOUT_RATIO_BLACKJACK_TO_PLAYER + bet
                     result_str = f"Hand {i+1}: Wins {payout - bet} with Blackjack"
                 elif outcome == "Win":
                     payout = bet * 2
